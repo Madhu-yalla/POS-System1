@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Checkout = ({ cartItems = [] }) => {
+const Checkout = ({ cartItems = [], clearCart }) => {
     const navigate = useNavigate();
     const [paymentMethod, setPaymentMethod] = useState('');
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
@@ -92,39 +92,47 @@ const Checkout = ({ cartItems = [] }) => {
         ? cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
         : 0;
 
-    const handlePayment = async () => {
-        if (!paymentMethod) {
-            alert('Please select a payment method.');
-            return;
-        }
-
-        if (paymentMethod === 'Credit Card' && (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv)) {
-            alert('Please fill in all card details.');
-            return;
-        }
-
-        try {
-            const orderData = {
-                customer: "CustomerName", // Replace with actual customer info
-                cartItems: cartItems.map(item => ({
-                    product: item._id,
-                    quantity: item.quantity,
-                })),
-                totalAmount: totalPrice,
-            };
-
-            await axios.post('http://localhost:8000/api/orders', orderData);
-            console.log('Order successfully placed');
-
-            // Simulate payment process and navigate to dashboard
-            setTimeout(() => {
-                alert('Payment Successful!');
-                navigate('/dashboard');
-            }, 1000);
-        } catch (err) {
-            console.error('Error during payment:', err);
-        }
-    };
+        const handlePayment = async () => {
+            if (!paymentMethod) {
+                alert('Please select a payment method.');
+                return;
+            }
+        
+            if (paymentMethod === 'Credit Card' && (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv)) {
+                alert('Please fill in all card details.');
+                return;
+            }
+        
+            try {
+                const orderData = {
+                    customer: "CustomerName", // Replace with actual customer info
+                    cartItems: cartItems.map(item => ({
+                        product: item._id,
+                        quantity: item.quantity,
+                    })),
+                    totalAmount: totalPrice,
+                };
+        
+                // Create order in the backend
+                await axios.post('http://localhost:8000/api/orders', orderData);
+                console.log('Order successfully placed');
+        
+                // Navigate to PayPal or simulate Bank Transfer
+                if (paymentMethod === 'PayPal') {
+                    window.location.href = 'https://www.paypal.com/checkoutnow'; // Replace with real PayPal checkout
+                } else if (paymentMethod === 'Bank Transfer') {
+                    alert('Please follow the instructions to complete the bank transfer.');
+                    navigate('/dashboard');
+                } else {
+                    alert('Payment Successful!');
+                    clearCart(); // Clear the cart after payment
+                    navigate('/dashboard');
+                }
+            } catch (err) {
+                console.error('Error during payment:', err);
+            }
+        };
+        
 
     const handlePaymentOptionChange = (e) => {
         const selectedMethod = e.target.value;
