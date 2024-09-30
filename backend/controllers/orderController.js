@@ -1,29 +1,44 @@
 const Order = require('../models/orderModel');
-const Product = require('../models/productModel'); // To validate product prices
+const Product = require('../models/productModel');
 
-// Create a new order
 exports.createOrder = async (req, res) => {
-    const { customer, cartItems, totalAmount } = req.body;
+    const { customer, cartItems, totalAmount, address } = req.body;
 
     try {
-        // Validate cart items and calculate total amount
+        const userId = req.user._id;
+
+        // Ensure that the products are valid and calculate the total amount
         let calculatedTotal = 0;
+        const updatedCartItems = [];
+
         for (let item of cartItems) {
-            const product = await Product.findById(item.product); // Find the product by ID
+            const product = await Product.findById(item.product);
             if (!product) {
                 return res.status(404).json({ message: `Product not found: ${item.product}` });
             }
 
-            calculatedTotal += product.price * item.quantity; // Calculate total
+            // Add product._id to updatedCartItems and calculate the total
+            calculatedTotal += product.price * item.quantity;
+            updatedCartItems.push({
+                product: product._id,  // Save product ID here
+                quantity: item.quantity
+            });
         }
 
-        // Compare totalAmount with calculatedTotal for integrity check
+        // Validate the total amount
         if (calculatedTotal !== totalAmount) {
             return res.status(400).json({ message: 'Total amount mismatch' });
         }
 
-        // Create and save order in the database
-        const order = new Order({ customer, cartItems, totalAmount: calculatedTotal });
+        // Save the order with correct cartItems
+        const order = new Order({
+            user: userId,
+            customer,
+            cartItems: updatedCartItems,  // Store updatedCartItems with correct product references
+            totalAmount: calculatedTotal,
+            address,
+        });
+
         await order.save();
         res.status(201).json(order);
     } catch (err) {
@@ -31,12 +46,17 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// Get all orders
+
+
 exports.getOrders = async (req, res) => {
     try {
-        const orders = await Order.find().populate('cartItems.product');
+        // Populate the product field inside cartItems
+        const orders = await Order.find({ user: req.user._id })
+            .populate('cartItems.product');  // Make sure to populate product reference
         res.json(orders);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
+

@@ -13,7 +13,7 @@ const Register = () => {
     try {
       const response = await axios.post('http://localhost:8000/api/auth/register', { name, email, password });
       if (response.data) {
-        navigate('/');
+        navigate('/login');
       }
     } catch (err) {
       console.log(err);
@@ -113,7 +113,7 @@ const Register = () => {
           <button type="submit" style={styles.button}>Register</button>
         </form>
         <div style={styles.home}>
-          <a href="/" style={styles.homeLink}>Already have an account? Login</a>
+          <a href="/login" style={styles.homeLink}>Already have an account? Login</a>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Frontend validation: Check if email and password are provided
     if (!email || !password) {
       setError('Please enter both email and password.');
@@ -25,7 +25,7 @@ const Login = () => {
         // Save the token to localStorage
         localStorage.setItem('token', response.data.token);
 
-        // Redirect to dashboard after successful login
+
         navigate('/dashboard');
       }
     } catch (err) {
@@ -98,7 +98,7 @@ const Login = () => {
     <div style={styles.container}>
       <div style={styles.form}>
         <h1 style={styles.title}>Login</h1>
-        
+
         {error && <div style={styles.error}>{error}</div>} {/* Display error message */}
 
         <form onSubmit={handleSubmit}>
@@ -124,7 +124,7 @@ const Login = () => {
           </div>
           <button type="submit" style={styles.button}>Login</button>
         </form>
-        
+
         <div style={styles.home}>
           <a href="/register" style={styles.homeLink}>Don't have an account? Register</a>
         </div>
