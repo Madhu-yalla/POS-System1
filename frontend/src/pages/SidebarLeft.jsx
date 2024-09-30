@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  // Use `useNavigate` for redirection
+import { Link, useNavigate } from 'react-router-dom';  
 import { FaHome, FaShopify, FaShoppingCart, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import axios from 'axios';
 
-const SidebarLeft = () => {
+const SidebarLeft = ({ cartItems = [] }) => {
     const [user, setUser] = useState({ name: '' });
-    const navigate = useNavigate(); // Initialize the `useNavigate` hook
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
-                    navigate('/'); // Redirect to login if no token found
+                    navigate('/'); 
                     return;
                 }
                 const config = {
@@ -20,11 +20,11 @@ const SidebarLeft = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 };
-                const response = await axios.get('http://localhost:8000/api/auth/profile', config); // API call to backend
-                setUser(response.data); // Set user data
+                const response = await axios.get('http://localhost:8000/api/auth/profile', config); 
+                setUser(response.data); 
             } catch (error) {
                 console.error('Error fetching user profile:', error);
-                navigate('/'); // Redirect to login if there is an error
+                navigate('/'); 
             }
         };
 
@@ -32,10 +32,12 @@ const SidebarLeft = () => {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');  // Remove token from localStorage
-        navigate('/');  // Redirect to login page
+        localStorage.removeItem('token');  
+        navigate('/login');  
         console.log('User logged out');
     };
+
+    const cartItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     const styles = {
         sidebarLeft: {
@@ -69,6 +71,7 @@ const SidebarLeft = () => {
             borderRadius: '10px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgb(201, 201, 201)',
+            position: 'relative',  // For cart badge positioning
             transition: 'background-color 0.3s ease',
         },
         menuIcon: {
@@ -114,21 +117,39 @@ const SidebarLeft = () => {
             color: 'rgb(179, 2, 2)',
             marginRight: '10px',
         },
+        cartBadge: {
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            backgroundColor: 'red',
+            color: 'white',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px',
+            fontWeight: 'bold',
+        },
     };
 
     return (
         <div style={styles.sidebarLeft}>
             <div style={styles.menuLinks}>
-                <Link to="/" style={styles.menuLink}>
+                <Link to="/dashboard" style={styles.menuLink}>
                     <FaHome style={styles.menuIcon} />
                     <span style={styles.menuText}>Home</span>
                 </Link>
-                {/* <Link to="/orders" style={styles.menuLink}>
+                <Link to="/orders" style={styles.menuLink}>
                     <FaShopify style={styles.menuIcon} />
                     <span style={styles.menuText}>Orders</span>
-                </Link> */}
+                </Link>
                 <Link to="/checkout" style={styles.menuLink}>
                     <FaShoppingCart style={styles.menuIcon} />
+                    {cartItemCount > 0 && (
+                        <div style={styles.cartBadge}>{cartItemCount}</div>
+                    )}
                     <span style={styles.menuText}>Cart</span>
                 </Link>
             </div>

@@ -13,6 +13,25 @@ const Checkout = ({ cartItems = [], clearCart }) => {
         cvv: '',
     });
 
+    const [address, setAddress] = useState({
+        street: '',
+        houseNumber: '',
+        city: '',
+        state: '',
+        zipCode: '',
+    });
+
+    // Function to validate if the address fields are all filled out
+    const validateAddress = () => {
+        return (
+            address.street &&
+            address.houseNumber &&
+            address.city &&
+            address.state &&
+            address.zipCode
+        );
+    };
+
     const styles = {
         container: {
             padding: '20px',
@@ -46,44 +65,25 @@ const Checkout = ({ cartItems = [], clearCart }) => {
             cursor: 'pointer',
             width: '100%',
             textAlign: 'center',
+            opacity: validateAddress() ? 1 : 0.5, // Disable button visually if address is incomplete
+            pointerEvents: validateAddress() ? 'auto' : 'none', // Disable interaction if address is incomplete
         },
-        paymentOptionsContainer: {
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: 'rgb(245, 245, 245)',
-            borderRadius: '10px',
-            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-            textAlign: 'center',
-        },
-        paymentOption: {
-            display: 'block',
-            marginBottom: '10px',
-            cursor: 'pointer',
-        },
-        modalOverlay: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        addressForm: {
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            flexDirection: 'column',
+            marginBottom: '20px',
         },
-        modalContent: {
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '10px',
-            width: '400px',
-            textAlign: 'center',
-        },
-        cardInput: {
-            width: '100%',
+        input: {
             padding: '10px',
-            margin: '10px 0',
+            marginBottom: '10px',
             borderRadius: '5px',
             border: '1px solid #ccc',
+            width: '100%',
+        },
+        addressTitle: {
+            fontSize: '20px',
+            marginBottom: '10px',
+            color: '#333',
         },
     };
 
@@ -92,47 +92,45 @@ const Checkout = ({ cartItems = [], clearCart }) => {
         ? cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
         : 0;
 
-        const handlePayment = async () => {
-            if (!paymentMethod) {
-                alert('Please select a payment method.');
-                return;
-            }
-        
-            if (paymentMethod === 'Credit Card' && (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv)) {
-                alert('Please fill in all card details.');
-                return;
-            }
-        
-            try {
-                const orderData = {
-                    customer: "CustomerName", // Replace with actual customer info
-                    cartItems: cartItems.map(item => ({
-                        product: item._id,
-                        quantity: item.quantity,
-                    })),
-                    totalAmount: totalPrice,
-                };
-        
-                // Create order in the backend
-                await axios.post('http://localhost:8000/api/orders', orderData);
-                console.log('Order successfully placed');
-        
-                // Navigate to PayPal or simulate Bank Transfer
-                if (paymentMethod === 'PayPal') {
-                    window.location.href = 'https://www.paypal.com/checkoutnow'; // Replace with real PayPal checkout
-                } else if (paymentMethod === 'Bank Transfer') {
-                    alert('Please follow the instructions to complete the bank transfer.');
-                    navigate('/dashboard');
-                } else {
-                    alert('Payment Successful!');
-                    clearCart(); // Clear the cart after payment
-                    navigate('/dashboard');
-                }
-            } catch (err) {
-                console.error('Error during payment:', err);
-            }
+    const handlePayment = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found!');
+            return;
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,  // Pass token in request headers
+            },
         };
-        
+
+        if (!paymentMethod) {
+            alert('Please select a payment method.');
+            return;
+        }
+
+        try {
+            const orderData = {
+                customer: "CustomerName",  // Replace with actual customer info
+                cartItems: cartItems.map(item => ({
+                    product: item._id,
+                    quantity: item.quantity,
+                })),
+                totalAmount: totalPrice,
+                address: `${address.houseNumber} ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`,
+            };
+
+            const response = await axios.post('http://localhost:8000/api/orders', orderData, config); // Include config with token
+            console.log('Order successfully placed:', response.data); // Check if the order is placed successfully
+            clearCart();
+            navigate('/orders');  // Navigate to the orders page after payment
+        } catch (err) {
+            console.error('Error during payment:', err);
+        }
+    };
+
+
 
     const handlePaymentOptionChange = (e) => {
         const selectedMethod = e.target.value;
@@ -143,18 +141,63 @@ const Checkout = ({ cartItems = [], clearCart }) => {
     return (
         <div style={styles.container}>
             <h2 style={styles.title}>Checkout</h2>
+
+            {/* Address Form */}
+            <div style={styles.addressForm}>
+                <h3 style={styles.addressTitle}>Delivery Address</h3>
+                <input
+                    type="text"
+                    placeholder="House Number"
+                    value={address.houseNumber}
+                    onChange={(e) => setAddress({ ...address, houseNumber: e.target.value })}
+                    style={styles.input}
+                />
+                <input
+                    type="text"
+                    placeholder="Street"
+                    value={address.street}
+                    onChange={(e) => setAddress({ ...address, street: e.target.value })}
+                    style={styles.input}
+                />
+                <input
+                    type="text"
+                    placeholder="City"
+                    value={address.city}
+                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                    style={styles.input}
+                />
+                <input
+                    type="text"
+                    placeholder="State"
+                    value={address.state}
+                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                    style={styles.input}
+                />
+                <input
+                    type="text"
+                    placeholder="Zip Code"
+                    value={address.zipCode}
+                    onChange={(e) => setAddress({ ...address, zipCode: e.target.value })}
+                    style={styles.input}
+                />
+            </div>
+
+            {/* Order Summary */}
             {cartItems.map((item, index) => (
                 <div key={index} style={styles.item}>
                     <p>{item.name}</p>
                     <p>${item.price} x {item.quantity}</p>
                 </div>
             ))}
+
             <div style={styles.total}>
                 <strong>Total: </strong> ${totalPrice.toFixed(2)}
             </div>
+
             <button
                 style={styles.paymentButton}
                 onClick={() => setShowPaymentOptions(true)}
+                disabled={!validateAddress()} // Disable button if address is not valid
             >
                 Pay Now
             </button>
