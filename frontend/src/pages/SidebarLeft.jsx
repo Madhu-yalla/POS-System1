@@ -123,10 +123,10 @@ const SidebarLeft = () => {
                     <FaHome style={styles.menuIcon} />
                     <span style={styles.menuText}>Home</span>
                 </Link>
-                <Link to="/orders" style={styles.menuLink}>
+                {/* <Link to="/orders" style={styles.menuLink}>
                     <FaShopify style={styles.menuIcon} />
                     <span style={styles.menuText}>Orders</span>
-                </Link>
+                </Link> */}
                 <Link to="/checkout" style={styles.menuLink}>
                     <FaShoppingCart style={styles.menuIcon} />
                     <span style={styles.menuText}>Cart</span>

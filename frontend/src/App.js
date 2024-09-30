@@ -6,7 +6,11 @@ import Dashboard from './pages/Dashboard';
 import Checkout from './pages/Checkout';
 
 function App() {
-  const [cartItems, setCartItems] = useState([]); // Store cartItems in the main App
+  const [cartItems, setCartItems] = useState([]); 
+
+  const clearCart = () => {
+    setCartItems([]); 
+  };
 
   return (
     <Router>
@@ -15,7 +19,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard setCartItems={setCartItems} cartItems={cartItems} />} />
-          <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
+          <Route path="/checkout" element={<Checkout cartItems={cartItems} clearCart={clearCart} />} />
         </Routes>
       </div>
     </Router>
