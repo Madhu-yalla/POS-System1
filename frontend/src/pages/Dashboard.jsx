@@ -77,7 +77,7 @@ const Dashboard = ({ cartItems, setCartItems }) => {
     return (
         <div style={styles.container}>
             <div style={styles.sidebarLeft}>
-                {/* Pass cartItems to SidebarLeft */}
+
                 <SidebarLeft cartItems={cartItems} />
             </div>
 

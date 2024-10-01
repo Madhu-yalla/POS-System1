@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  
+import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaShopify, FaShoppingCart, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import axios from 'axios';
 
 const SidebarLeft = ({ cartItems = [] }) => {
     const [user, setUser] = useState({ name: '' });
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
-                    navigate('/'); 
+                    navigate('/');
                     return;
                 }
                 const config = {
@@ -20,11 +20,11 @@ const SidebarLeft = ({ cartItems = [] }) => {
                         Authorization: `Bearer ${token}`,
                     },
                 };
-                const response = await axios.get('http://localhost:8000/api/auth/profile', config); 
-                setUser(response.data); 
+                const response = await axios.get('http://localhost:8000/api/auth/profile', config);
+                setUser(response.data);
             } catch (error) {
                 console.error('Error fetching user profile:', error);
-                navigate('/'); 
+                navigate('/');
             }
         };
 
@@ -32,8 +32,8 @@ const SidebarLeft = ({ cartItems = [] }) => {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');  
-        navigate('/login');  
+        localStorage.removeItem('token');
+        navigate('/');
         console.log('User logged out');
     };
 

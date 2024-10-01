@@ -21,7 +21,6 @@ const Checkout = ({ cartItems = [], clearCart }) => {
         zipCode: '',
     });
 
-    // Function to validate if the address fields are all filled out
     const validateAddress = () => {
         return (
             address.street &&
@@ -65,8 +64,8 @@ const Checkout = ({ cartItems = [], clearCart }) => {
             cursor: 'pointer',
             width: '100%',
             textAlign: 'center',
-            opacity: validateAddress() ? 1 : 0.5, // Disable button visually if address is incomplete
-            pointerEvents: validateAddress() ? 'auto' : 'none', // Disable interaction if address is incomplete
+            opacity: validateAddress() ? 1 : 0.5,
+            pointerEvents: validateAddress() ? 'auto' : 'none',
         },
         addressForm: {
             display: 'flex',
@@ -87,7 +86,6 @@ const Checkout = ({ cartItems = [], clearCart }) => {
         },
     };
 
-    // Calculate total price based on cartItems
     const totalPrice = cartItems.length > 0
         ? cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
         : 0;
@@ -101,7 +99,7 @@ const Checkout = ({ cartItems = [], clearCart }) => {
 
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`,  // Pass token in request headers
+                Authorization: `Bearer ${token}`,
             },
         };
 
@@ -112,7 +110,7 @@ const Checkout = ({ cartItems = [], clearCart }) => {
 
         try {
             const orderData = {
-                customer: "CustomerName",  // Replace with actual customer info
+                customer: "CustomerName",
                 cartItems: cartItems.map(item => ({
                     product: item._id,
                     quantity: item.quantity,
@@ -121,10 +119,10 @@ const Checkout = ({ cartItems = [], clearCart }) => {
                 address: `${address.houseNumber} ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`,
             };
 
-            const response = await axios.post('http://localhost:8000/api/orders', orderData, config); // Include config with token
-            console.log('Order successfully placed:', response.data); // Check if the order is placed successfully
+            const response = await axios.post('http://localhost:8000/api/orders', orderData, config);
+            console.log('Order successfully placed:', response.data);
             clearCart();
-            navigate('/orders');  // Navigate to the orders page after payment
+            navigate('/orders');
         } catch (err) {
             console.error('Error during payment:', err);
         }
@@ -142,7 +140,6 @@ const Checkout = ({ cartItems = [], clearCart }) => {
         <div style={styles.container}>
             <h2 style={styles.title}>Checkout</h2>
 
-            {/* Address Form */}
             <div style={styles.addressForm}>
                 <h3 style={styles.addressTitle}>Delivery Address</h3>
                 <input
@@ -182,7 +179,6 @@ const Checkout = ({ cartItems = [], clearCart }) => {
                 />
             </div>
 
-            {/* Order Summary */}
             {cartItems.map((item, index) => (
                 <div key={index} style={styles.item}>
                     <p>{item.name}</p>
@@ -197,12 +193,11 @@ const Checkout = ({ cartItems = [], clearCart }) => {
             <button
                 style={styles.paymentButton}
                 onClick={() => setShowPaymentOptions(true)}
-                disabled={!validateAddress()} // Disable button if address is not valid
+                disabled={!validateAddress()}
             >
                 Pay Now
             </button>
 
-            {/* Payment options modal */}
             {showPaymentOptions && (
                 <div style={styles.modalOverlay}>
                     <div style={styles.modalContent}>
@@ -236,7 +231,6 @@ const Checkout = ({ cartItems = [], clearCart }) => {
                                 Bank Transfer
                             </label>
 
-                            {/* Show card details form if Credit Card is selected */}
                             {showCardForm && (
                                 <>
                                     <input

@@ -1,13 +1,14 @@
 import React from 'react';
 import SidebarLeft from './pages/SidebarLeft';
+import Header from './Header'; // Import the Header component
 
 const Layout = ({ children, cartItems }) => {
     const styles = {
         container: {
             display: 'flex',
-            height: '100vh',
+            flexDirection: 'row',
+            height: 'calc(100vh - 80px)', // Adjust height considering the header
             width: '100%',
-            padding: '10px',
         },
         sidebarLeft: {
             flexBasis: '10%',
@@ -20,7 +21,7 @@ const Layout = ({ children, cartItems }) => {
             borderRadius: '30px 0 0 30px',
         },
         mainContent: {
-            flexBasis: '95%',
+            flexBasis: '90%',
             backgroundColor: 'rgb(237, 235, 235)',
             padding: '50px',
             height: '100%',
@@ -32,12 +33,15 @@ const Layout = ({ children, cartItems }) => {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.sidebarLeft}>
-                <SidebarLeft cartItems={cartItems} />
-            </div>
-            <div style={styles.mainContent}>
-                {children} {/* This will render the main content of each page */}
+        <div>
+            {/* <Header />  */}
+            <div style={styles.container}>
+                <div style={styles.sidebarLeft}>
+                    <SidebarLeft cartItems={cartItems} />
+                </div>
+                <div style={styles.mainContent}>
+                    {children} {/* This will render the main content of each page */}
+                </div>
             </div>
         </div>
     );
