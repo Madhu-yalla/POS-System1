@@ -59,4 +59,29 @@ exports.getOrders = async (req, res) => {
     }
 };
 
+// In your orderController.js
+exports.cancelOrder = async (req, res) => {
+    const orderId = req.params.id;
+    try {
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (order.status === 'Cancelled') {
+            return res.status(400).json({ message: "Order is already cancelled" });
+        }
+
+        // Update order status to "Cancelled"
+        order.status = 'Cancelled';
+        await order.save();
+
+        res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ message: "Error cancelling order", error });
+    }
+};
+
+
 

@@ -45,7 +45,7 @@ const Dashboard = ({ cartItems, setCartItems }) => {
             padding: '10px',
         },
         sidebarLeft: {
-            flexBasis: '5%',
+            flexBasis: '10%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
