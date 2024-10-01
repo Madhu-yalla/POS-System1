@@ -4,11 +4,10 @@ import axios from 'axios';
 
 const Content = ({ handleAddToCart }) => {
     const [products, setProducts] = useState([]);
-    const [categories] = useState(['Fruits', 'Dairy', 'Vegetables', 'Meat', 'Beverages']); // List of categories
-    const [selectedCategories, setSelectedCategories] = useState([]); // Array to store selected categories
+    const [categories] = useState(['Fruits', 'Dairy', 'Vegetables', 'Meat', 'Beverages']);
+    const [selectedCategories, setSelectedCategories] = useState([]);
 
     useEffect(() => {
-        // Fetch products from the backend API based on the selected categories
         const fetchProducts = async () => {
             try {
                 let endpoint = 'http://localhost:8000/api/products';
@@ -17,7 +16,7 @@ const Content = ({ handleAddToCart }) => {
                     endpoint += `?categories=${categoryQuery}`;
                 }
                 const response = await axios.get(endpoint);
-                setProducts(response.data); // Set the products in the state
+                setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -26,7 +25,6 @@ const Content = ({ handleAddToCart }) => {
         fetchProducts();
     }, [selectedCategories]);
 
-    // Handle checkbox changes
     const handleCategoryChange = (category) => {
         setSelectedCategories((prevSelectedCategories) => {
             if (prevSelectedCategories.includes(category)) {
@@ -54,8 +52,8 @@ const Content = ({ handleAddToCart }) => {
         },
         productGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', // Adjust columns dynamically
-            gap: '20px', // Space between items
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '20px',
             width: '100%',
         },
         checkbox: {
@@ -67,7 +65,6 @@ const Content = ({ handleAddToCart }) => {
         <div style={styles.productContainer}>
             <h1 style={styles.title}>Available Products</h1>
 
-            {/* Category Filter with Checkboxes */}
             <div style={styles.categoryFilter}>
                 {categories.map((category) => (
                     <label key={category} style={styles.checkbox}>

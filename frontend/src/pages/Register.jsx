@@ -13,10 +13,15 @@ const Register = () => {
     try {
       const response = await axios.post('http://localhost:8000/api/auth/register', { name, email, password });
       if (response.data) {
-        navigate('/login');
+        navigate('/');
       }
     } catch (err) {
-      console.log(err);
+      // Display the error message as an alert if registration fails
+      if (err.response && err.response.data && err.response.data.message) {
+        alert(err.response.data.message); // Show specific error from backend
+      } else {
+        alert('Registration failed. Please try again.'); // Generic error message
+      }
     }
   };
 
@@ -113,7 +118,7 @@ const Register = () => {
           <button type="submit" style={styles.button}>Register</button>
         </form>
         <div style={styles.home}>
-          <a href="/login" style={styles.homeLink}>Already have an account? Login</a>
+          <a href="/" style={styles.homeLink}>Already have an account? Login</a>
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Frontend validation: Check if email and password are provided
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
@@ -20,16 +19,13 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
 
-      // Check if the response contains the token
       if (response.data && response.data.token) {
-        // Save the token to localStorage
         localStorage.setItem('token', response.data.token);
 
 
         navigate('/dashboard');
       }
     } catch (err) {
-      // Backend validation: Set error message if login fails
       setError('Invalid email or password.');
     }
   };
