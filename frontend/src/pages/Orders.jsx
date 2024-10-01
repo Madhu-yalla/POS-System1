@@ -39,6 +39,38 @@ const Orders = () => {
         return deliveryDate.toDateString();
     };
 
+    const handleCancelOrder = async (orderId) => {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
+        if (!confirmCancel) return;
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found. Please log in.');
+            return;
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        try {
+            // Send request to cancel the order
+            const response = await axios.put(`http://localhost:8000/api/orders/${orderId}/cancel`, {}, config);
+            
+            // Update the orders state to reflect the change
+            setOrders(orders.map(order => 
+                order._id === orderId ? { ...order, status: 'Cancelled' } : order
+            ));
+            
+            alert("Order has been cancelled successfully.");
+        } catch (error) {
+            console.error("Error cancelling the order:", error);
+            alert("Failed to cancel the order.");
+        }
+    };
+
     const styles = {
         container: {
             padding: '20px',
@@ -69,9 +101,6 @@ const Orders = () => {
             marginBottom: '20px',
             transition: 'transform 0.2s ease-in-out',
         },
-        orderCardHover: {
-            transform: 'translateY(-5px)',
-        },
         orderItem: {
             fontSize: '16px',
             marginBottom: '5px',
@@ -87,6 +116,14 @@ const Orders = () => {
         ul: {
             listStyle: 'none',
             padding: '0',
+        },
+        cancelButton: {
+            backgroundColor: 'red',
+            color: 'white',
+            padding: '10px 15px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            marginTop: '10px',
         },
     };
 
@@ -116,6 +153,19 @@ const Orders = () => {
                             </ul>
                         </div>
                         <p><strong style={styles.strongText}>Shipping Address:</strong> {order.address}</p>
+                        
+                        {/* Conditionally styled status */}
+                        <p>Status: <span style={{ color: order.status === 'Cancelled' ? 'red' : 'green', fontWeight: 'bold' }}>{order.status}</span></p>
+                        
+                        {/* Only show the cancel button if the order is not already cancelled */}
+                        {order.status !== 'Cancelled' && (
+                            <button
+                                style={styles.cancelButton}
+                                onClick={() => handleCancelOrder(order._id)}
+                            >
+                                Cancel Order
+                            </button>
+                        )}
                     </div>
                 ))
             )}
